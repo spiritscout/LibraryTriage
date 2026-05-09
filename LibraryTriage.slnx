@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/LibraryTriage.CLI/LibraryTriage.CLI.csproj" />
+    <Project Path="src/LibraryTriage.Core/LibraryTriage.Core.csproj" />
+  </Folder>
+</Solution>

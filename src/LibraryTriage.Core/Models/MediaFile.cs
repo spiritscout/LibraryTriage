@@ -1,4 +1,5 @@
 using LibraryTriage.Core.FFprobe;
+using System.Linq;
 
 namespace LibraryTriage.Core.Models;
 
@@ -17,4 +18,13 @@ public class MediaFile
     public double AvgFrameRate { get; set; }
     public double Duration { get; set; }
     public double BitRateDensity { get; set; }
+
+    public MediaFile(FFprobeOutput ffprobeOutput, string filePath)
+    {
+        var videoStream = ffprobeOutput.Streams.FirstOrDefault(s => s.CodecType == "video");
+        if (videoStream == null)
+        {
+            throw new InvalidOperationException($"No video stream found in given file: {filePath}");
+        }
+    }
 }

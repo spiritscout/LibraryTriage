@@ -26,5 +26,13 @@ public class MediaFile
         {
             throw new InvalidOperationException($"No video stream found in given file: {filePath}");
         }
+        FilePath = filePath;
+        CodecName = videoStream.CodecName;
+        Width = videoStream.Width;
+        Height = videoStream.Height;
+        Size = long.Parse(ffprobeOutput.Format.Size);
+        Encoder = ffprobeOutput.Format.Tags?.Encoder ?? "Unknown";
+        CreationTime = ffprobeOutput.Format.Tags?.CreationTime ?? "Unknown";
+
     }
 }

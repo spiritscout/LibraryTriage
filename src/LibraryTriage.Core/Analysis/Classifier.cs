@@ -33,4 +33,36 @@ public class Classifier
             Reasoning = string.Join(", ", reasoning)
         };
     }
+
+    private void EvaluateSRCandidate(MediaFile file, List<RecommendationType> recommendations, List<string> reasoning, ref int srSignalScore)
+    {
+        var oldCodecs = new[] { "mpeg2video", "msmpeg4v3", "xvid", "wmv2", "wmv3", "vc1" };
+        if (oldCodecs.Contains(file.CodecName))
+        {
+            srSignalScore += 4;
+            reasoning.Add($"Old codec ({file.CodecName}) detected");
+        }
+        if (file.Height < 720)
+        {
+            srSignalScore += 4;
+            reasoning.Add($"Low Resolution ({file.Height}) detected");
+        }
+        if (file.BitRateDensity <= 0.03 && file.CodecName == "h264")
+        {
+            srSignalScore += 3;
+            reasoning.Add("h264 with low bitrate density");
+        }
+        //(this was the year ER changed to HD)
+        if (file.YearReleased <= 2008)
+        {
+            srSignalScore += 2;
+            reasoning.Add("Produced pre-2008");
+        }
+        //add a codec advisory, no scoring effect
+        reasoning.Add($"Encoder: {file.Encoder}");
+        
+        //add the recommendation 
+        if (srSignalScore > 0)
+            recommendations.Add(RecommendationType.SRCandidate);
+    }
 }

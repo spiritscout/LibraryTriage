@@ -19,6 +19,7 @@ public class MediaFile
     public double AvgFrameRate { get; set; }
     public double Duration { get; set; }
     public double BitRateDensity { get; set; }
+    public double MegabytesPerMinute { get; set; }
 
     public MediaFile(FFprobeOutput ffprobeOutput, string filePath)
     {
@@ -38,6 +39,7 @@ public class MediaFile
         Duration = double.Parse(ffprobeOutput.Format.Duration);
         AvgFrameRate = ParseFrameRate(videoStream.AvgFrameRate);
         BitRateDensity = BitRate / ((double)Width * Height * AvgFrameRate);
+        MegabytesPerMinute = Size / 1024.0 / 1024.0 / (Duration / 60.0);
         YearReleased = ParseYear(filePath);
         Category = ParseCategory(filePath);
         

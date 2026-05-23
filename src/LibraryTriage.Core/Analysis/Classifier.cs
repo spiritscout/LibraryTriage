@@ -1,5 +1,6 @@
 using LibraryTriage.Core.Models;
 using System.Linq;
+using System.IO;
 
 namespace LibraryTriage.Core.Analysis;
 
@@ -28,6 +29,12 @@ public class Classifier
         return new ClassificationResult
         {
             FilePath = file.FilePath,
+            FileName = Path.GetFileName(file.FilePath),
+            Resolution = $"{file.Width}x{file.Height}",
+            FileSizeMB = Math.Round(file.Size / 1024.0 / 1024.0, 1),
+            Category = file.Category,
+            MegabytesPerMinute = file.MegabytesPerMinute,
+            Codec = file.CodecName,
             Recommendations = recommendations,
             Confidence = confidence,
             Reasoning = string.Join(", ", reasoning)

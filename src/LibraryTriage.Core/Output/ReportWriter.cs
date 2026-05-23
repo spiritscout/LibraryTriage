@@ -18,6 +18,7 @@ public class ReportWriter
         var json = JsonSerializer.Serialize(report, new JsonSerializerOptions
         {
             WriteIndented = true,
+            // change default enum int serializer
             Converters = { new JsonStringEnumConverter() }
         });
         File.WriteAllText(outputPath, json);

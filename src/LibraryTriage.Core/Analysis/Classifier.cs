@@ -65,4 +65,41 @@ public class Classifier
         if (srSignalScore > 0)
             recommendations.Add(RecommendationType.SRCandidate);
     }
+
+    private void EvaluateReencode(MediaFile file, List<RecommendationType> recommendations, List<string> reasoning)
+    {   
+        var reencode = false;
+        if (file.CodecName == "h264" && file.BitRateDensity >= 0.1)
+        {
+            reasoning.Add($"Inefficient H264 encode (bitrate density: {file.BitRateDensity:F3})");
+            reencode = true;
+        }
+        if (file.CodecName == "hevc" && file.BitRateDensity > 0.06)
+        {
+            reasoning.Add($"Inefficient H265 encode (bitrate density: {file.BitRateDensity:F3})");
+            reencode = true;
+        }
+        if (reencode)
+        {
+            recommendations.Add(RecommendationType.ReencodeRecommended);
+        }
+    }
+
+    private void EvaluateH265Upgrade(MediaFile file, List<RecommendationType> recommendations, List<string> reasoning)
+    {
+        if (file.CodecName == "h264" && file.BitRateDensity >= 0.1)
+        {
+            reasoning.Add($"Could upgrade to H265");
+            recommendations.Add(RecommendationType.H265UpgradeRecommended);
+        }
+    }
+
+    private void EvaluateAlreadyH265(MediaFile file, List<RecommendationType> recommendations, List<string> reasoning)
+    {
+        if (file.CodecName == "hevc")
+        {
+            reasoning.Add("Already encoded in H265");
+            recommendations.Add(RecommendationType.AlreadyH265);
+        }
+    }
 }

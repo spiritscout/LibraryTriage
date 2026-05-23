@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using LibraryTriage.Core.Models;
 
 namespace LibraryTriage.Core.Output;
@@ -17,6 +18,7 @@ public class ReportWriter
         var json = JsonSerializer.Serialize(report, new JsonSerializerOptions
         {
             WriteIndented = true
+            Converters = { new JsonStringEnumConverter() }
         });
         File.WriteAllText(outputPath, json);
     }

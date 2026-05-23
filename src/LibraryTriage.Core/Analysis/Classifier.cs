@@ -59,8 +59,8 @@ public class Classifier
             srSignalScore += 3;
             reasoning.Add("h264 with low bitrate density");
         }
-        //(this was the year ER changed to HD)
-        if (file.YearReleased <= 2008)
+        //(this was the year the first ever film was made, and when ER changed to HD, respectively)
+        if (file.YearReleased >= 1888 && file.YearReleased <= 2008)
         {
             srSignalScore += 2;
             reasoning.Add("Produced pre-2008");

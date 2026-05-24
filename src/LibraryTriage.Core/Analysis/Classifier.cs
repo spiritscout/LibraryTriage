@@ -22,9 +22,11 @@ public class Classifier
         if (!recommendations.Any())
             recommendations.Add(RecommendationType.LeaveAlone);
 
-        var confidence = srSignalScore >= 8 ? ConfidenceLevel.High
-            : srSignalScore >= 4 ? ConfidenceLevel.Medium
-            : ConfidenceLevel.Low;
+        ConfidenceLevel? confidence = recommendations.Contains(RecommendationType.SRCandidate)
+            ? srSignalScore >= 8 ? ConfidenceLevel.High
+                : srSignalScore >= 4 ? ConfidenceLevel.Medium
+                : ConfidenceLevel.Low
+            : null;
 
         return new ClassificationResult
         {
@@ -108,5 +110,25 @@ public class Classifier
             reasoning.Add("Already encoded in H265");
             recommendations.Add(RecommendationType.AlreadyH265);
         }
+    }
+
+    private string ParseShowName(string filePath)
+    {
+        var parts = filePath.Split(Path.DirectorySeparatorChar);
+        
+        int categoryIndex = Array.FindIndex(parts, p => p.Contains("Shows"));
+        if (categoryIndex == -1)
+            categoryIndex = Array.FindIndex(parts, p => p.Contains("Movies"));
+        if (categoryIndex == -1)
+            categoryIndex = Array.FindIndex(parts, p => p.Contains("Shorts"));
+        
+        if (categoryIndex == -1 || categoryIndex + 1 >= parts.Length)
+            return string.Empty;
+
+        // only return show name for TV shows
+        if (parts[categoryIndex].Contains("Shows"))
+            return parts[categoryIndex + 1];
+            
+        return string.Empty;
     }
 }

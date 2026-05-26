@@ -39,7 +39,9 @@ public class Classifier
             Codec = file.CodecName,
             Recommendations = recommendations,
             Confidence = confidence,
-            Reasoning = string.Join(", ", reasoning)
+            Reasoning = string.Join(", ", reasoning),
+            ShowName = ParseShowName(file.FilePath),
+            Season = ParseSeason(file.FilePath)
         };
     }
 
@@ -128,6 +130,26 @@ public class Classifier
         // only return show name for TV shows
         if (parts[categoryIndex].Contains("Shows"))
             return parts[categoryIndex + 1];
+            
+        return string.Empty;
+    }
+
+    private string ParseSeason(string filePath)
+    {
+        var parts = filePath.Split(Path.DirectorySeparatorChar);
+        
+        int categoryIndex = Array.FindIndex(parts, p => p.Contains("Shows"));
+        if (categoryIndex == -1)
+            categoryIndex = Array.FindIndex(parts, p => p.Contains("Movies"));
+        if (categoryIndex == -1)
+            categoryIndex = Array.FindIndex(parts, p => p.Contains("Shorts"));
+        
+        if (categoryIndex == -1 || categoryIndex + 2 >= parts.Length)
+            return string.Empty;
+
+        // only return show name for TV shows
+        if (parts[categoryIndex].Contains("Shows"))
+            return parts[categoryIndex + 2];
             
         return string.Empty;
     }

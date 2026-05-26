@@ -13,8 +13,9 @@ public class ReportWriter
     {
         // filter out leave alone and already h265
         var actionable = results.Where(r =>
-            !r.Recommendations.Contains(RecommendationType.LeaveAlone) &&
-            !r.Recommendations.Contains(RecommendationType.AlreadyH265)
+            !(r.Recommendations.Count == 1 && 
+            r.Recommendations.Contains(RecommendationType.AlreadyH265)) &&
+            !r.Recommendations.Contains(RecommendationType.LeaveAlone)
         ).ToList();
 
         var dataJson = BuildDataJson(actionable);

@@ -68,11 +68,11 @@ public class MediaFile
     private string ParseCategory(string filePath)
     {
         if (filePath.Contains("Show")){
-            return "Show";
+            return "Shows";
         } else if (filePath.Contains("Movie")){
-            return "Movie";
+            return "Movies";
         } else if (filePath.Contains("Short")){
-            return "Short";
+            return "Shorts";
         } else
         {
             return "other";

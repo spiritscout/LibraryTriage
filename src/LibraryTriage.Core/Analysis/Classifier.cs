@@ -63,11 +63,21 @@ public class Classifier
             srSignalScore += 3;
             reasoning.Add("h264 with low bitrate density");
         }
-        //(this was the year the first ever film was made, and when ER changed to HD, respectively)
-        if (file.YearReleased >= 1888 && file.YearReleased <= 2008)
+        //(this was the year the first ever film was made, and when ER changed to HD, respectively, see ReadME)
+        int seasonNumber = ParseSeasonNumber(file.FilePath);
+        int effectiveYear = (file.YearReleased > 0 && seasonNumber > 1) 
+            ? file.YearReleased + seasonNumber 
+            : file.YearReleased;
+
+        if (effectiveYear >= 1888 && effectiveYear < 2000)
         {
             srSignalScore += 2;
-            reasoning.Add("Produced pre-2008");
+            reasoning.Add($"Produced pre-2000 (effective year: {effectiveYear})");
+        }
+        else if (effectiveYear >= 2000 && effectiveYear <= 2008)
+        {
+            srSignalScore += 1;
+            reasoning.Add($"Transitional era content (effective year: {effectiveYear})");
         }
         //add a codec advisory, no scoring effect
         reasoning.Add($"Encoder: {file.Encoder}");
@@ -152,5 +162,30 @@ public class Classifier
             return parts[categoryIndex + 2];
             
         return string.Empty;
+    }
+
+    private int ParseSeasonNumber(string filePath)
+    {
+        var parts = filePath.Split(Path.DirectorySeparatorChar);
+        
+        int categoryIndex = Array.FindIndex(parts, p => p.Contains("Shows"));
+        if (categoryIndex == -1)
+            categoryIndex = Array.FindIndex(parts, p => p.Contains("Movies"));
+        if (categoryIndex == -1)
+            categoryIndex = Array.FindIndex(parts, p => p.Contains("Shorts"));
+        
+        if (categoryIndex == -1 || categoryIndex + 2 >= parts.Length)
+            return 0;
+
+        if (!parts[categoryIndex].Contains("Shows"))
+            return 0;
+
+        var season = parts[categoryIndex + 2];
+        var seasonParts = season.Split(' ');
+        
+        if (seasonParts.Length < 2)
+            return 0;
+
+        return int.TryParse(seasonParts[1], out int number) ? number : 0;
     }
 }

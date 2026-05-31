@@ -111,14 +111,23 @@ SR candidacy is scored rather than binary, producing a confidence level alongsid
 | Old codec (mpeg2video, msmpeg4v3/DivX, xvid, wmv2, wmv3, vc1) | 4 |
 | Height below 720px | 4 |
 | H264 with bitrate density below 0.03 | 3 |
-| Production year between 1888–2008 | 2 |
+| Production year pre-2000 (effective) | 2 |
+| Production year 2000–2008 (effective) | 1 |
 
 **Confidence thresholds:**
 - High — 8+ points
 - Medium — 4–7 points
 - Low — 1–3 points
 
-The 2008 year cutoff was chosen as the watershed year when many TV productions switched to HD filming (e.g. ER switched to HD in 2008).
+**Effective year calculation**
+
+For TV shows, the production year is approximated per-season by adding the season number to the show's premiere year — e.g. a show premiering in 2003 has an effective year of 2008 by Season 5. This avoids flagging later seasons of long-running shows that aired well into the HD era. Season 0 and Season 1 are evaluated on the premiere year directly.
+
+The two year thresholds reflect two meaningful industry transitions:
+- **2000** — the year ER made its first HD move (Season 7, 1080i), marking the beginning of the HD transition for US broadcast drama. ER was a production trendsetter and this is a widely cited early adoption point.
+- **2008** — by which point HD had become standard practice for new US broadcast productions.
+
+Content in the transitional 2000–2008 window scores 1 point rather than 2, reflecting genuine uncertainty — production quality in this era varied considerably depending on the show, the network, and whether the editing pipeline matched the capture format.
 
 The encoder tag (HandBrake, Lavf, etc.) is included in the reasoning string as advisory context but does not affect scoring.
 

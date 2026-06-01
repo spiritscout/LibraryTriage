@@ -6,6 +6,13 @@ namespace LibraryTriage.Core.Analysis;
 
 public class Classifier
 {
+    private readonly Settings _settings;
+
+    public Classifier(Settings settings)
+    {
+        _settings = settings;
+    }
+
     public ClassificationResult Classify(MediaFile file)
     {
         var recommendations = new List<RecommendationType>();
@@ -53,12 +60,12 @@ public class Classifier
             srSignalScore += 4;
             reasoning.Add($"Old codec ({file.CodecName}) detected");
         }
-        if (file.Height < 720)
+        if (file.Height < _settings.Classification.MinHeightForSR)
         {
             srSignalScore += 4;
             reasoning.Add($"Low Resolution ({file.Height}) detected");
         }
-        if (file.BitRateDensity <= 0.03 && file.CodecName == "h264")
+        if (file.BitRateDensity <= _settings.Classification.H264BitrateDensityThresholdLower && file.CodecName == "h264")
         {
             srSignalScore += 3;
             reasoning.Add("h264 with low bitrate density");
@@ -69,12 +76,12 @@ public class Classifier
             ? file.YearReleased + seasonNumber 
             : file.YearReleased;
 
-        if (effectiveYear >= 1888 && effectiveYear < 2000)
+        if (effectiveYear >= 1888 && effectiveYear < _settings.Classification.YearThresholdLower)
         {
             srSignalScore += 2;
             reasoning.Add($"Produced pre-2000 (effective year: {effectiveYear})");
         }
-        else if (effectiveYear >= 2000 && effectiveYear <= 2008)
+        else if (effectiveYear >= _settings.Classification.YearThresholdLower && effectiveYear <= _settings.Classification.YearThresholdUpper)
         {
             srSignalScore += 1;
             reasoning.Add($"Transitional era content (effective year: {effectiveYear})");
@@ -90,12 +97,12 @@ public class Classifier
     private void EvaluateReencode(MediaFile file, List<RecommendationType> recommendations, List<string> reasoning)
     {   
         var reencode = false;
-        if (file.CodecName == "h264" && file.BitRateDensity >= 0.1)
+        if (file.CodecName == "h264" && file.BitRateDensity >= _settings.Classification.H264BitrateDensityThresholdHigher)
         {
             reasoning.Add($"Inefficient H264 encode (bitrate density: {file.BitRateDensity:F3})");
             reencode = true;
         }
-        if (file.CodecName == "hevc" && file.BitRateDensity > 0.06)
+        if (file.CodecName == "hevc" && file.BitRateDensity > _settings.Classification.H265BitrateDensityThreshold)
         {
             reasoning.Add($"Inefficient H265 encode (bitrate density: {file.BitRateDensity:F3})");
             reencode = true;
@@ -108,7 +115,7 @@ public class Classifier
 
     private void EvaluateH265Upgrade(MediaFile file, List<RecommendationType> recommendations, List<string> reasoning)
     {
-        if (file.CodecName == "h264" && file.BitRateDensity >= 0.1)
+        if (file.CodecName == "h264" && file.BitRateDensity >= _settings.Classification.H264BitrateDensityThresholdHigher)
         {
             reasoning.Add($"Could upgrade to H265");
             recommendations.Add(RecommendationType.H265UpgradeRecommended);

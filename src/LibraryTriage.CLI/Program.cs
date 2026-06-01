@@ -38,11 +38,11 @@ if (args.Length > 1)
 var libraryPath = args[0];
 
 // initialise classes for processing loop
-var fileDiscovery = new FileDiscovery();
+var fileDiscovery = new FileDiscovery(settings);
 var ffprobeRunner = new FFprobeRunner();
-var classifier = new Classifier();
+var classifier = new Classifier(settings);
 var results = new List<ClassificationResult>();
-var reportWriter = new ReportWriter();
+var reportWriter = new ReportWriter(settings);
 
 Console.WriteLine($"Scanning library at: {libraryPath}");
 

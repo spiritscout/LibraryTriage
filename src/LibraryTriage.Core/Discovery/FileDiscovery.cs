@@ -1,11 +1,16 @@
 using System.IO;
+using LibraryTriage.Core.Models;
 
 namespace LibraryTriage.Core.Discovery;
 
 public class FileDiscovery
 {
-    private static readonly string[] VideoExtensions = 
-        { ".mkv", ".mp4", ".avi", ".m4v", ".mov", ".wmv", ".mpg", ".mpeg", ".ts", ".m2ts", ".webm" };
+    private readonly Settings _settings;
+
+    public FileDiscovery(Settings settings)
+    {
+        _settings = settings;
+    }
 
     public List<string> DiscoverFiles(string rootPath)
     {
@@ -15,12 +20,11 @@ public class FileDiscovery
         //loop through and add files to new list if extension matches
         foreach (var file in allFiles)
         {
-            if (VideoExtensions.Contains(Path.GetExtension(file).ToLower()))
+            if (_settings.Discovery.VideoExtensions.Contains(Path.GetExtension(file).ToLower()))
             {
                 videoFiles.Add(file);
             }
         }
         return videoFiles;
-
     }
 }

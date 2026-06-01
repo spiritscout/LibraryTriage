@@ -9,6 +9,13 @@ namespace LibraryTriage.Core.Output;
 
 public class ReportWriter
 {
+    private readonly Settings _settings;
+
+    public ReportWriter(Settings settings)
+    {
+        _settings = settings;
+    }
+
     public void WriteReport(List<ClassificationResult> results, string outputPath)
     {
         // filter out leave alone and already h265
@@ -21,6 +28,15 @@ public class ReportWriter
         var dataJson = BuildDataJson(actionable);
         var html = GetHtmlTemplate(dataJson);
         File.WriteAllText(outputPath.Replace(".json", ".html"), html);
+
+        if (_settings.Output.AutoOpenReport)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = outputPath.Replace(".json", ".html"),
+                UseShellExecute = true
+            });
+        }
     }
 
     private string BuildDataJson(List<ClassificationResult> results)

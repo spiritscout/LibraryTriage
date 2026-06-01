@@ -25,6 +25,35 @@ dotnet build LibraryTriage.sln
 
 ---
 
+## Configuration
+
+Tunable thresholds and settings live in `src/LibraryTriage.CLI/appsettings.json`. The file is copied to the build output and read at runtime.
+
+```json
+{
+    "Classification": {
+        "YearThresholdLower": 2000,
+        "YearThresholdUpper": 2008,
+        "MinHeightForSR": 720,
+        "H264BitrateDensityThresholdLower": 0.03,
+        "H264BitrateDensityThresholdHigher": 0.1,
+        "H265BitrateDensityThreshold": 0.06
+    },
+    "Discovery": {
+        "VideoExtensions": [".mkv", ".mp4", ".avi", ".m4v", ".mov", ".wmv", ".mpg", ".mpeg", ".ts", ".m2ts", ".webm"]
+    },
+    "Output": {
+        "AutoOpenReport": false
+    }
+}
+```
+
+- **Classification** — thresholds used by the classifier. See "Classification Rules" below for what each value controls.
+- **Discovery** — file extensions to scan for. Anything not in this list is silently skipped.
+- **Output** — `AutoOpenReport` opens the HTML report in your default browser when the scan completes.
+
+Edit and save the file, rebuild with `dotnet build`, and your new values take effect on the next run.
+
 ## How to Run
 
 Point the tool at your library root — the folder containing your Movies, Shows, and/or Shorts directories:
@@ -153,7 +182,7 @@ Applied to H264 files with bitrate density above 0.1. Advisory only — whether 
 The HTML report groups results by category (Movies, Shows, Shorts) with collapsible sections. TV shows are organised by show name and then by season.
 
 Each file entry shows:
-- Filename
+- Cleaned episode name where possible (e.g. `S03E10 — Tokyo Colony` parsed from messy release filenames), falling back to the raw filename otherwise
 - Codec, resolution, file size, MB/min
 - Colour-coded recommendation badges
 - Confidence level (SR candidates only)
@@ -176,7 +205,7 @@ The report includes a search bar and filter buttons for navigating large results
 
 **Long-running TV shows** — the production year is parsed from the show folder name (e.g. `NCIS (2003)`), which means every episode of a long-running show gets flagged with the premiere year, including later seasons that aired well after the 2008 cutoff. Resolving this properly would require per-episode air date lookup from an external source like TVDB.
 
-**Episode filename quality** — many downloaded episode files have messy machine-generated names (e.g. `Show.S03E10.Title.1080p.WEBRip.x265.mkv`). The report currently displays the raw filename rather than a cleaned-up version.
+**Episode filename cleaning is heuristic** — the tool extracts the `SxxExx` marker and episode title from messy release filenames using regex pattern matching against a list of known quality/codec tags. This handles common scene release naming conventions well but isn't exhaustive — unusual release formats may not clean correctly, and dots in actual episode titles (e.g. `M.I.A.`) get converted to spaces during cleaning.
 
 **Metadata-only analysis** — the current version uses FFprobe metadata only. Bitrate, codec, and resolution are reliable signals but cannot detect source quality degradation, compression artefacts, or the difference between a clean encode and a layered DVD-rip. Frame analysis (planned) would address these cases.
 
@@ -187,13 +216,12 @@ The report includes a search bar and filter buttons for navigating large results
 ## Roadmap
 
 **Higher priority:**
-- Configuration file (`appsettings.json`) for tunable thresholds — bitrate density values, year cutoff, video extensions, auto-open report
 - Docker containerisation for running against a library on a different machine
+- Per-episode air date lookup to better handle long-running shows
 
 **Medium priority:**
-- Per-episode air date lookup to fix the long-running show limitation
-- Episode filename cleaning — parse readable names from `SxxExx` patterns
-- Auto-open report option (to be driven by config)
+- Improved episode filename cleaning for edge cases
+- GUI application (WPF/MAUI) wrapping the existing core logic
 
 **Lower priority:**
 - Frame analysis layer — computational artefact and noise detection without ML, to extend beyond metadata-only analysis

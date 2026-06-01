@@ -4,6 +4,22 @@ using LibraryTriage.Core.FFprobe;
 using LibraryTriage.Core.Models;
 using LibraryTriage.Core.Analysis;
 using LibraryTriage.Core.Output;
+using Microsoft.Extensions.Configuration;
+
+// loads config
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false)
+    .Build();
+
+var settings = new Settings();
+configuration.Bind(settings);
+
+if (settings == null)
+{
+    Console.WriteLine("Failed to load appsettings.json");
+    return;
+}
 
 // no args check
 if (args.Length == 0)

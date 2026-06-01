@@ -30,4 +30,5 @@ public class ClassificationResult
     public List<RecommendationType> Recommendations { get; set; }
     public ConfidenceLevel? Confidence { get; set; }
     public string Reasoning { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
 }

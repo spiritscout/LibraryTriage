@@ -195,4 +195,16 @@ public class Classifier
 
         return int.TryParse(seasonParts[1], out int number) ? number : 0;
     }
+
+    // for HTML output
+    private string CleanEpisodeName(string fileName)
+    {
+        // check for a good cutoff in name string before cleaning
+        var noiseMarkers = new[] {
+            "1080p", "720p", "480p", "2160p", "4k",
+            "WEB-DL", "WEBRip", "BluRay", "BDRip", "HDTV", "DVDRip",
+            "x264", "x265", "H.264", "H.265", "HEVC", "AVC",
+            "AAC", "DTS", "AC3"
+        };
+    }
 }

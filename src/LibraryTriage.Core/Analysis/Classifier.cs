@@ -1,6 +1,7 @@
 using LibraryTriage.Core.Models;
 using System.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace LibraryTriage.Core.Analysis;
 

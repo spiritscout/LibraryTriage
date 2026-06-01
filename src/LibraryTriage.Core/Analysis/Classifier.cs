@@ -48,7 +48,8 @@ public class Classifier
             Confidence = confidence,
             Reasoning = string.Join(", ", reasoning),
             ShowName = ParseShowName(file.FilePath),
-            Season = ParseSeason(file.FilePath)
+            Season = ParseSeason(file.FilePath),
+            DisplayName = CleanEpisodeName(Path.GetFileName(file.FilePath))
         };
     }
 
@@ -206,5 +207,39 @@ public class Classifier
             "x264", "x265", "H.264", "H.265", "HEVC", "AVC",
             "AAC", "DTS", "AC3"
         };
+
+        // match against S--E-- portion of filename
+        var match = Regex.Match(fileName, @"[Ss](\d{1,2})[Ee](\d{1,2})");
+        if (!match.Success)
+            return fileName;
+
+        int season = int.Parse(match.Groups[1].Value);
+        int episode = int.Parse(match.Groups[2].Value);
+
+        // index cutoff point
+        int afterMatchPos = match.Index + match.Length;
+        int cutoffPos = fileName.Length;
+
+        foreach (var marker in noiseMarkers)
+        {
+            int markerPos = fileName.IndexOf(marker, afterMatchPos, StringComparison.OrdinalIgnoreCase);
+            if (markerPos != -1 && markerPos < cutoffPos)
+            {
+                cutoffPos = markerPos;
+            }
+        }
+
+        string rawTitle = fileName.Substring(afterMatchPos, cutoffPos - afterMatchPos);
+
+        string cleanTitle = rawTitle
+            .Replace('.', ' ')
+            .Replace('_', ' ')
+            .Trim(' ', '-');
+
+        // assemble formatted output
+        if (string.IsNullOrWhiteSpace(cleanTitle))
+            return $"S{season:D2}E{episode:D2}";
+
+        return $"S{season:D2}E{episode:D2} — {cleanTitle}";
     }
 }

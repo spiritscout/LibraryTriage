@@ -501,7 +501,7 @@ function fileEntryHtml(file, extraClass) {
   return `
     <div class="file-entry ${extraClass || ""}" data-recs="${file.Recommendations.join(",")}" data-name="${file.FileName.toLowerCase()}">
       <div class="file-entry-top">
-        <div class="file-name">${file.FileName}</div>
+        <div class="file-name">${file.DisplayName || file.FileName}</div>
         <div class="badges">${badges}</div>
       </div>
       <div class="file-meta">
